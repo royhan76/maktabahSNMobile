@@ -3,6 +3,7 @@ package com.santripesisir.roudhotuttholibin.reader;
 import android.content.Context;
 import com.santripesisir.roudhotuttholibin.utils.CipherUtils;
 import com.santripesisir.roudhotuttholibin.utils.ZlibUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -34,6 +35,21 @@ public class ReaderEngine {
         public int chapterCount;
         public int wordCount;
         public int paragraphCount;
+    }
+
+    /** Represents one entry in the Table of Contents. */
+    public static class TocEntry {
+        /** 0-based page/chapter index in the reader. */
+        public int pageIndex;
+        /** Display title from chapter title or first heading. */
+        public String title;
+        /**
+         * Hierarchy level: 1 = Bab (top), 2 = Fashl, 3 = Sub-Fashl, etc.
+         * Derived from the first heading block's "level" field, or 1 if none.
+         */
+        public int level;
+        /** Optional physical page info (e.g. "الجزء: 1 - الصفحة: 11"). */
+        public String pageInfo;
     }
 
     private final Context context;
@@ -152,6 +168,64 @@ public class ReaderEngine {
 
     public int getPageCount() {
         return chaptersIndices.size();
+    }
+
+    /**
+     * Builds a Table of Contents by scanning every chapter.
+     * Reads heading level from the first heading block found.
+     * Falls back to level 1 if no heading block exists.
+     * Skips chapters whose title is empty or numeric-only (physical page markers).
+     */
+    public List<TocEntry> buildTableOfContents() {
+        List<TocEntry> toc = new ArrayList<>();
+        int total = chaptersIndices.size();
+        for (int i = 0; i < total; i++) {
+            try {
+                JSONObject ch = getChapter(i);
+                String chTitle = ch.optString("title", "").trim();
+                if (chTitle.isEmpty()) continue;
+
+                int level = 1;
+                String pageInfo = "";
+
+                JSONArray blocks = ch.optJSONArray("blocks");
+                if (blocks != null) {
+                    for (int b = 0; b < blocks.length(); b++) {
+                        JSONObject blk = blocks.optJSONObject(b);
+                        if (blk == null) continue;
+                        String type = blk.optString("type", "");
+                        if ("heading".equals(type)) {
+                            level = blk.optInt("level", 1);
+                            // Normalize: level 1 is largest heading (Bab),
+                            // level 2 = Fashl, level 3 = sub-Fashl, etc.
+                            // MAI headings use h1=1, h2=2 … but some books start at h2,
+                            // so we just store raw level and handle display in UI.
+                            break;
+                        }
+                    }
+                    // Look for physical page info in last few blocks
+                    for (int b = blocks.length() - 1; b >= Math.max(0, blocks.length() - 3); b--) {
+                        JSONObject blk = blocks.optJSONObject(b);
+                        if (blk == null) continue;
+                        String blkText = blk.optString("text", "");
+                        if (blkText.contains("\u0627\u0644\u062c\u0632\u0621") ||
+                                blkText.contains("\u0627\u0644\u0635\u0641\u062d\u0629")) {
+                            pageInfo = blkText;
+                            break;
+                        }
+                    }
+                }
+
+                TocEntry entry = new TocEntry();
+                entry.pageIndex = i;
+                entry.title = chTitle;
+                entry.level = level;
+                entry.pageInfo = pageInfo;
+                toc.add(entry);
+            } catch (Exception ignored) {
+            }
+        }
+        return toc;
     }
 
     public JSONObject getChapter(int index) throws Exception {

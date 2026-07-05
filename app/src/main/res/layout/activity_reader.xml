@@ -30,6 +30,15 @@
                 android:gravity="center_vertical">
 
                 <ImageButton
+                    android:id="@+id/btn_reader_toc"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_toc"
+                    android:contentDescription="Daftar Isi"
+                    app:tint="?attr/colorOnPrimaryContainer" />
+
+                <ImageButton
                     android:id="@+id/btn_reader_search"
                     android:layout_width="48dp"
                     android:layout_height="48dp"

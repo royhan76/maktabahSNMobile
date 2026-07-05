@@ -32,8 +32,12 @@ import com.santripesisir.roudhotuttholibin.utils.ReaderPreferences;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ReaderActivity extends AppCompatActivity {
 
@@ -45,11 +49,14 @@ public class ReaderActivity extends AppCompatActivity {
     private ImageButton btnSearch;
     private ImageButton btnFont;
     private ImageButton btnBookmark;
+    private ImageButton btnToc;
 
     private String fileName;
     private String bookId;
     private String bookTitle;
     private int targetPage = -1;
+    private java.util.ArrayList<String> highlightKeywords;
+    private boolean ignoreHarakat = false;
 
     private ReaderEngine engine;
     private ReaderPreferences preferences;
@@ -75,6 +82,8 @@ public class ReaderActivity extends AppCompatActivity {
         bookId = getIntent().getStringExtra("BOOK_ID");
         bookTitle = getIntent().getStringExtra("BOOK_TITLE");
         targetPage = getIntent().getIntExtra("TARGET_PAGE", -1);
+        highlightKeywords = getIntent().getStringArrayListExtra("HIGHLIGHT_KEYWORDS");
+        ignoreHarakat = getIntent().getBooleanExtra("IGNORE_HARAKAT", false);
 
         if (fileName == null || bookId == null) {
             Toast.makeText(this, "Kitab tidak valid!", Toast.LENGTH_SHORT).show();
@@ -90,6 +99,7 @@ public class ReaderActivity extends AppCompatActivity {
         btnSearch = findViewById(R.id.btn_reader_search);
         btnFont = findViewById(R.id.btn_reader_font);
         btnBookmark = findViewById(R.id.btn_reader_bookmark);
+        btnToc = findViewById(R.id.btn_reader_toc);
 
         // Setup Toolbar
         toolbar.setTitle(bookTitle != null ? bookTitle : "Membaca");
@@ -130,6 +140,12 @@ public class ReaderActivity extends AppCompatActivity {
         }
         viewPager.setCurrentItem(startPage, false);
         updatePageIndicator(startPage, totalPages);
+
+        // Show TOC automatically on first ever open (no saved position)
+        if (targetPage < 0 && bookmarkManager.isFirstOpen(bookId)) {
+            // Small delay so the reader renders first
+            viewPager.postDelayed(() -> showTableOfContents(), 400);
+        }
     }
 
     private void setupListeners(int totalPages) {
@@ -171,6 +187,8 @@ public class ReaderActivity extends AppCompatActivity {
                 Toast.makeText(this, "Halaman disimpan ke bookmark", Toast.LENGTH_SHORT).show();
             }
         });
+
+        btnToc.setOnClickListener(v -> showTableOfContents());
     }
 
     private void updatePageIndicator(int position, int totalPages) {
@@ -190,6 +208,126 @@ public class ReaderActivity extends AppCompatActivity {
         } catch (Exception e) {
             tvChapterTitle.setText("Halaman " + (position + 1));
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Table of Contents
+    // -------------------------------------------------------------------------
+
+    /** Shows a BottomSheetDialog with the full hierarchical Table of Contents. */
+    private void showTableOfContents() {
+        if (isFinishing() || isDestroyed()) return;
+
+        BottomSheetDialog tocDialog = new BottomSheetDialog(this);
+        View tocView = LayoutInflater.from(this).inflate(R.layout.dialog_toc, null);
+        tocDialog.setContentView(tocView);
+
+        TextView tvTocTitle = tocView.findViewById(R.id.tv_toc_dialog_title);
+        LinearLayout tocContainer = tocView.findViewById(R.id.ll_toc_container);
+        View progressBar = tocView.findViewById(R.id.toc_progress);
+
+        tvTocTitle.setText("Daftar Isi — " + bookTitle);
+        progressBar.setVisibility(View.VISIBLE);
+        tocContainer.setVisibility(View.GONE);
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            List<ReaderEngine.TocEntry> toc = engine.buildTableOfContents();
+            // Find min level to normalize indentation
+            int minLevel = Integer.MAX_VALUE;
+            for (ReaderEngine.TocEntry e : toc) {
+                if (e.level < minLevel) minLevel = e.level;
+            }
+            final int baseLevel = (minLevel == Integer.MAX_VALUE) ? 1 : minLevel;
+
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                progressBar.setVisibility(View.GONE);
+
+                if (toc.isEmpty()) {
+                    Toast.makeText(this, "Daftar isi tidak tersedia", Toast.LENGTH_SHORT).show();
+                    tocDialog.dismiss();
+                    return;
+                }
+
+                int dp8 = (int) (8 * getResources().getDisplayMetrics().density);
+                int dp16 = dp8 * 2;
+
+                for (ReaderEngine.TocEntry entry : toc) {
+                    View itemView = LayoutInflater.from(this)
+                            .inflate(R.layout.item_toc_entry, tocContainer, false);
+
+                    TextView tvTitle = itemView.findViewById(R.id.tv_toc_title);
+                    TextView tvPage = itemView.findViewById(R.id.tv_toc_page);
+                    View indentBar = itemView.findViewById(R.id.view_toc_indent);
+                    View spacer = itemView.findViewById(R.id.view_toc_spacer);
+
+                    tvTitle.setText(entry.title);
+
+                    if (!entry.pageInfo.isEmpty()) {
+                        tvPage.setText(entry.pageInfo);
+                        tvPage.setVisibility(View.VISIBLE);
+                    } else {
+                        tvPage.setText("Halaman " + (entry.pageIndex + 1));
+                        tvPage.setVisibility(View.VISIBLE);
+                    }
+
+                    // Indent: each sub-level adds 16dp of left space
+                    int relLevel = entry.level - baseLevel; // 0 = top-level
+                    int indentPx = relLevel * dp16;
+
+                    ViewGroup.LayoutParams spacerParams = spacer.getLayoutParams();
+                    spacerParams.width = indentPx;
+                    spacer.setLayoutParams(spacerParams);
+
+                    // Top-level bold; sub-levels smaller text
+                    if (relLevel == 0) {
+                        tvTitle.setTypeface(null, android.graphics.Typeface.BOLD);
+                        tvTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 16);
+                        indentBar.setAlpha(0.8f);
+                    } else if (relLevel == 1) {
+                        tvTitle.setTypeface(null, android.graphics.Typeface.NORMAL);
+                        tvTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 14);
+                        indentBar.setAlpha(0.4f);
+                    } else {
+                        tvTitle.setTypeface(null, android.graphics.Typeface.NORMAL);
+                        tvTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
+                        indentBar.setAlpha(0.2f);
+                    }
+
+                    // Apply padding variation
+                    itemView.setPaddingRelative(
+                            dp8, dp8 / 2,
+                            dp16, dp8 / 2);
+
+                    int finalPageIndex = entry.pageIndex;
+                    itemView.setOnClickListener(v -> {
+                        viewPager.setCurrentItem(finalPageIndex, false);
+                        tocDialog.dismiss();
+                    });
+
+                    tocContainer.addView(itemView);
+
+                    // Add divider for top-level entries
+                    if (relLevel == 0) {
+                        View divider = new View(this);
+                        LinearLayout.LayoutParams divParams = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, 1);
+                        divParams.setMargins(dp16, 0, dp16, 0);
+                        divider.setLayoutParams(divParams);
+                        android.util.TypedValue tv = new android.util.TypedValue();
+                        getTheme().resolveAttribute(com.google.android.material.R.attr.colorOutlineVariant, tv, true);
+                        divider.setBackgroundColor(tv.data);
+                        tocContainer.addView(divider);
+                    }
+                }
+
+                tocContainer.setVisibility(View.VISIBLE);
+            });
+        });
+        executor.shutdown();
+
+        tocDialog.show();
     }
 
     private void showFontSettingsDialog() {
@@ -349,8 +487,75 @@ public class ReaderActivity extends AppCompatActivity {
                             if (text == null || text.trim().isEmpty()) continue;
 
                             TextView tv = new TextView(container.getContext());
-                            tv.setText(text);
-                            tv.setTypeface(typeface);
+                             
+                             CharSequence finalDisplay = text;
+                             if (highlightKeywords != null && !highlightKeywords.isEmpty()) {
+                                 android.text.SpannableString spannable = new android.text.SpannableString(text);
+                                 boolean found = false;
+                                 
+                                 android.util.TypedValue typedValue = new android.util.TypedValue();
+                                 tv.getContext().getTheme().resolveAttribute(com.google.android.material.R.attr.colorSecondaryContainer, typedValue, true);
+                                 int colorHighlight = typedValue.data;
+                                 if (colorHighlight == 0) {
+                                     colorHighlight = 0xFFFFD54F;
+                                 }
+
+                                 for (String kw : highlightKeywords) {
+                                     String cleanText = ignoreHarakat ? com.santripesisir.roudhotuttholibin.search.SearchIndexManager.removeHarakat(text) : text;
+                                     String cleanKw = ignoreHarakat ? com.santripesisir.roudhotuttholibin.search.SearchIndexManager.removeHarakat(kw) : kw;
+
+                                     int index = cleanText.toLowerCase().indexOf(cleanKw.toLowerCase());
+                                     while (index != -1) {
+                                         int start = 0;
+                                         int cleanCount = 0;
+                                         while (start < text.length() && cleanCount < index) {
+                                             char c = text.charAt(start);
+                                             if (c >= 0x064B && c <= 0x065F || c == 0x0670) {
+                                                 start++;
+                                             } else {
+                                                 start++;
+                                                 cleanCount++;
+                                             }
+                                         }
+
+                                         int end = start;
+                                         int kwCleanCount = 0;
+                                         while (end < text.length() && kwCleanCount < cleanKw.length()) {
+                                             char c = text.charAt(end);
+                                             if (c >= 0x064B && c <= 0x065F || c == 0x0670) {
+                                                 end++;
+                                             } else {
+                                                 end++;
+                                                 kwCleanCount++;
+                                             }
+                                         }
+
+                                         if (start < end && end <= text.length()) {
+                                             spannable.setSpan(
+                                                     new android.text.style.BackgroundColorSpan(colorHighlight),
+                                                     start,
+                                                     end,
+                                                     android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                             );
+                                             spannable.setSpan(
+                                                     new android.text.style.ForegroundColorSpan(0xFFB71C1C), // dark red text for contrast
+                                                     start,
+                                                     end,
+                                                     android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                             );
+                                             found = true;
+                                         }
+
+                                         index = cleanText.toLowerCase().indexOf(cleanKw.toLowerCase(), index + 1);
+                                     }
+                                 }
+                                 if (found) {
+                                     finalDisplay = spannable;
+                                 }
+                             }
+                             
+                             tv.setText(finalDisplay);
+                             tv.setTypeface(typeface);
                             tv.setTextSize(fontSizeSp);
                             tv.setLineSpacing(0, lineSpacing);
                             tv.setTextDirection(View.TEXT_DIRECTION_RTL);

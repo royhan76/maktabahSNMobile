@@ -277,6 +277,8 @@ public class SearchActivity extends AppCompatActivity {
                         intent.putExtra("BOOK_ID", result.bookId);
                         intent.putExtra("BOOK_TITLE", result.bookTitle);
                         intent.putExtra("TARGET_PAGE", result.pageId - 1); // 0-indexed reader
+                        intent.putStringArrayListExtra("HIGHLIGHT_KEYWORDS", new ArrayList<>(lastUsedKeywords));
+                        intent.putExtra("IGNORE_HARAKAT", ignoreHarakat);
                         startActivity(intent);
                     } else {
                         Toast.makeText(SearchActivity.this, "File kitab tidak ditemukan!", Toast.LENGTH_SHORT).show();

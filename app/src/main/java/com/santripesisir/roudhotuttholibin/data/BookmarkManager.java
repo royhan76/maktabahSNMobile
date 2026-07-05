@@ -47,4 +47,10 @@ public class BookmarkManager {
     public boolean isBookmarked(String bookId, int pageIndex) {
         return getBookmarks(bookId).contains(String.valueOf(pageIndex));
     }
+
+    // --- First-open detection ---
+    /** Returns true if this book has never been opened before (no reading history exists). */
+    public boolean isFirstOpen(String bookId) {
+        return !prefs.contains(KEY_HISTORY_PREFIX + bookId);
+    }
 }
