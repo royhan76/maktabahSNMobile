@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimaryContainer"
+            app:title="Pencarian Multi Filter"
+            app:navigationIcon="@drawable/ic_back" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view_search"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/app_bar_layout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Dynamic Filters Container -->
+            <LinearLayout
+                android:id="@+id/filters_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Add Filter Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_add_filter"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tambah Filter"
+                app:icon="@drawable/ic_add"
+                android:layout_marginTop="8dp" />
+
+            <!-- Options Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Opsi Pencarian"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="?android:attr/colorPrimary"
+                        android:layout_marginBottom="8dp" />
+
+                    <CheckBox
+                        android:id="@+id/cb_ignore_harakat"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Abaikan Harakat (Disarankan)"
+                        android:checked="true" />
+
+                    <CheckBox
+                        android:id="@+id/cb_same_order"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Urutan kata harus sama" />
+
+                    <CheckBox
+                        android:id="@+id/cb_search_all_books"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Cari pada seluruh kitab" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Search Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_execute_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Cari Sekarang"
+                app:icon="@drawable/ic_search" />
+
+            <!-- Progress Indicator -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/search_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+            <!-- Results Section -->
+            <TextView
+                android:id="@+id/tv_results_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Hasil Pencarian"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <!-- Search Results RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_search_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_search_result" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="12dp">
+
+    <!-- ========== HERO HEADER CARD (compact) ========== -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:strokeWidth="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_hero_gradient"
+            android:clipChildren="true"
+            android:clipToPadding="false">
+
+            <!-- Decorative Circle Top-Right -->
+            <View
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="end|top"
+                android:layout_marginTop="-30dp"
+                android:layout_marginEnd="-20dp"
+                android:background="@drawable/bg_hero_circle" />
+
+            <!-- Decorative Circle Bottom-Left -->
+            <View
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_gravity="start|bottom"
+                android:layout_marginStart="-15dp"
+                android:layout_marginBottom="-20dp"
+                android:background="@drawable/bg_hero_circle_small" />
+
+            <!-- Main Content Row: text left, icon right -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="18dp">
+
+                <!-- Left: Texts -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Maktabah SN Digital"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:shadowColor="#40000000"
+                        android:shadowDx="0"
+                        android:shadowDy="1"
+                        android:shadowRadius="3" />
+
+                    <!-- Thin accent line -->
+                    <View
+                        android:layout_width="36dp"
+                        android:layout_height="2dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="6dp"
+                        android:background="#80FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Perpustakaan Santri Nusantara"
+                        android:textSize="12sp"
+                        android:textColor="#C0FFFFFF" />
+
+                </LinearLayout>
+
+                <!-- Right: Icon -->
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/ic_hero_book"
+                    android:alpha="0.6"
+                    android:importantForAccessibility="no" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- ========== SEARCH INPUT ========== -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_search"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Cari nama kitab..."
+        app:startIconDrawable="@drawable/ic_search"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/card_header">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- ========== BOOKS GRID ========== -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_books"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/til_search"
+        tools:listitem="@layout/item_book" />
+
+    <!-- ========== INDEXING PROGRESS OVERLAY ========== -->
+    <LinearLayout
+        android:id="@+id/indexing_progress_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#A0000000"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="gone">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:indicatorSize="64dp" />
+
+        <TextView
+            android:id="@+id/tv_indexing_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Membuat indeks pencarian..."
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

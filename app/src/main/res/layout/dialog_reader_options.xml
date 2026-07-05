@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="?android:attr/windowBackground">
+
+    <!-- Handle bar for Bottom Sheet -->
+    <View
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="?android:attr/textColorSecondary" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pengaturan Tampilan"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="?android:attr/textColorPrimary"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Font Type Radio Group -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pilihan Font"
+        android:textSize="14sp"
+        android:layout_marginBottom="8dp" />
+
+    <RadioGroup
+        android:id="@+id/dialog_rg_font_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/dialog_rb_font_amiri"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Amiri"
+            android:layout_marginEnd="24dp" />
+
+        <RadioButton
+            android:id="@+id/dialog_rb_font_kfgqpc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="KFGQPC" />
+    </RadioGroup>
+
+    <!-- Font Size Slider -->
+    <TextView
+        android:id="@+id/dialog_tv_font_size_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ukuran Teks: 22sp"
+        android:textSize="14sp" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/dialog_slider_font_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:valueFrom="16"
+        android:valueTo="36"
+        android:stepSize="1"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Line Spacing Slider -->
+    <TextView
+        android:id="@+id/dialog_tv_line_spacing_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Jarak Baris: 1.8"
+        android:textSize="14sp" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/dialog_slider_line_spacing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:valueFrom="1.2"
+        android:valueTo="3.0"
+        android:stepSize="0.1"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Margins Slider -->
+    <TextView
+        android:id="@+id/dialog_tv_margin_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Margin Samping: 16dp"
+        android:textSize="14sp" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/dialog_slider_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:valueFrom="8"
+        android:valueTo="32"
+        android:stepSize="2"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Theme Mode Switch -->
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/dialog_switch_dark_mode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mode Gelap"
+        android:textSize="14sp"
+        android:layout_marginBottom="8dp" />
+
+</LinearLayout>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pengaturan"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:id="@+id/tv_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sesuaikan konfigurasi pembacaan kitab"
+            android:textSize="14sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:layout_marginBottom="24dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pengaturan Teks Arab"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/colorPrimary"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Font Size -->
+                <TextView
+                    android:id="@+id/tv_font_size_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ukuran Font: 22sp"
+                    android:textSize="14sp" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/slider_font_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="16"
+                    android:valueTo="36"
+                    android:stepSize="1" />
+
+                <!-- Line Spacing -->
+                <TextView
+                    android:id="@+id/tv_line_spacing_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Line Spacing: 1.8"
+                    android:textSize="14sp"
+                    android:layout_marginTop="12dp" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/slider_line_spacing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="1.2"
+                    android:valueTo="3.0"
+                    android:stepSize="0.1" />
+
+                <!-- Margin -->
+                <TextView
+                    android:id="@+id/tv_margin_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Margin Halaman: 16dp"
+                    android:textSize="14sp"
+                    android:layout_marginTop="12dp" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/slider_margin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="8"
+                    android:valueTo="32"
+                    android:stepSize="2" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jenis Font &amp; Mode"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/colorPrimary"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Font Type Radio Group -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pilihan Font"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp" />
+
+                <RadioGroup
+                    android:id="@+id/rg_font_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <RadioButton
+                        android:id="@+id/rb_font_amiri"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Amiri"
+                        android:layout_marginEnd="24dp" />
+
+                    <RadioButton
+                        android:id="@+id/rb_font_kfgqpc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="KFGQPC" />
+                </RadioGroup>
+
+                <!-- Dark Mode -->
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switch_dark_mode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Mode Gelap"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_reset_settings"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reset Pengaturan ke Default"
+            android:textColor="?android:attr/colorError" />
+
+    </LinearLayout>
+
+</ScrollView>
