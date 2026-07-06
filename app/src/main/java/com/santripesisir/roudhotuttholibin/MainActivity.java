@@ -11,7 +11,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.santripesisir.roudhotuttholibin.ui.AboutFragment;
 import com.santripesisir.roudhotuttholibin.ui.BookmarksFragment;
 import com.santripesisir.roudhotuttholibin.ui.LibraryFragment;
 import com.santripesisir.roudhotuttholibin.ui.SettingsFragment;
@@ -51,8 +50,11 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new BookmarksFragment();
             } else if (itemId == R.id.nav_settings) {
                 selectedFragment = new SettingsFragment();
-            } else if (itemId == R.id.nav_about) {
-                selectedFragment = new AboutFragment();
+            } else if (itemId == R.id.nav_ai) {
+                // Jalankan ChatActivity secara native
+                android.content.Intent intent = new android.content.Intent(MainActivity.this, com.santripesisir.roudhotuttholibin.ui.ChatActivity.class);
+                startActivity(intent);
+                return false; // Kembalikan false agar item "SN-AI" tidak tetap ter-highlight karena membuka Activity baru
             }
 
             if (selectedFragment != null) {
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+        bottomNavigationView.setSelectedItemId(R.id.nav_library);
 
         // Load default fragment
         if (savedInstanceState == null) {

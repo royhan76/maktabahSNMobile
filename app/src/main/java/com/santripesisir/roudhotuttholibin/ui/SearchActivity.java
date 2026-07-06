@@ -26,6 +26,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.santripesisir.roudhotuttholibin.R;
+import com.santripesisir.roudhotuttholibin.reader.ReaderEngine;
 import com.santripesisir.roudhotuttholibin.search.SearchIndexManager;
 import com.santripesisir.roudhotuttholibin.utils.ReaderPreferences;
 
@@ -163,11 +164,17 @@ public class SearchActivity extends AppCompatActivity {
         lastUsedKeywords = new ArrayList<>(keywords);
 
         executorService.execute(() -> {
+            // Jika mode cari semua kitab, pastikan semua kitab sudah ter-index terlebih dahulu.
+            // Kitab yang belum ter-index tidak akan muncul di hasil pencarian.
+            if (searchAll) {
+                ensureAllBooksIndexed();
+            }
+
             List<SearchIndexManager.SearchResult> results = searchDb.search(
                     activeBookId,
                     keywords,
                     ignoreHarakat,
-                    false, // Case insensitive is implicitly managed or default
+                    false,
                     sameOrder,
                     searchAll
             );
@@ -185,6 +192,62 @@ public class SearchActivity extends AppCompatActivity {
                 }
             });
         });
+    }
+
+    /**
+     * Memastikan semua kitab di folder assets/books sudah ter-index.
+     * Dipanggil dari background thread sebelum pencarian multi-kitab.
+     * Kitab yang sudah ter-index dilewati (tidak di-index ulang).
+     */
+    private void ensureAllBooksIndexed() {
+        try {
+            String[] assetFiles = getAssets().list("books");
+            if (assetFiles == null) return;
+
+            int totalToIndex = 0;
+            // Hitung berapa kitab yang belum ter-index
+            for (String file : assetFiles) {
+                if (!file.endsWith(".mai")) continue;
+                String bookId = file.replace(".mai", "");
+                if (!searchDb.isBookIndexed(bookId)) totalToIndex++;
+            }
+
+            if (totalToIndex == 0) return; // Semua sudah ter-index
+
+            final int[] indexed = {0};
+            for (String file : assetFiles) {
+                if (!file.endsWith(".mai")) continue;
+                String bookId = file.replace(".mai", "");
+                if (searchDb.isBookIndexed(bookId)) continue;
+
+                try {
+                    ReaderEngine engine = new ReaderEngine(this, file);
+                    engine.initialize();
+                    ReaderEngine.BookMetadata meta = engine.getMetadata();
+
+                    final int currentNum = ++indexed[0];
+                    final int total = totalToIndex;
+                    mainHandler.post(() -> {
+                        if (!isFinishing()) {
+                            tvResultsCount.setVisibility(View.VISIBLE);
+                            tvResultsCount.setText("Mengindeks kitab " + currentNum + "/" + total + ": " + meta.title);
+                        }
+                    });
+
+                    searchDb.indexBook(this, file, meta, null);
+                } catch (Exception e) {
+                    e.printStackTrace(); // Lewati kitab yang gagal diproses
+                }
+            }
+
+            mainHandler.post(() -> {
+                if (!isFinishing()) {
+                    tvResultsCount.setVisibility(View.GONE);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ViewHolder> {
@@ -213,8 +276,8 @@ public class SearchActivity extends AppCompatActivity {
             int colorHighlight = typedValue.data;
 
             for (String kw : lastUsedKeywords) {
-                String cleanSnippet = ignoreHarakat ? SearchIndexManager.removeHarakat(snippetText) : snippetText;
-                String cleanKw = ignoreHarakat ? SearchIndexManager.removeHarakat(kw) : kw;
+                String cleanSnippet = SearchIndexManager.normalizeArabic(snippetText);
+                String cleanKw = SearchIndexManager.normalizeArabic(kw);
 
                 int index = cleanSnippet.toLowerCase().indexOf(cleanKw.toLowerCase());
                 while (index != -1) {

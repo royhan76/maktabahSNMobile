@@ -501,8 +501,8 @@ public class ReaderActivity extends AppCompatActivity {
                                  }
 
                                  for (String kw : highlightKeywords) {
-                                     String cleanText = ignoreHarakat ? com.santripesisir.roudhotuttholibin.search.SearchIndexManager.removeHarakat(text) : text;
-                                     String cleanKw = ignoreHarakat ? com.santripesisir.roudhotuttholibin.search.SearchIndexManager.removeHarakat(kw) : kw;
+                                     String cleanText = com.santripesisir.roudhotuttholibin.search.SearchIndexManager.normalizeArabic(text);
+                                     String cleanKw = com.santripesisir.roudhotuttholibin.search.SearchIndexManager.normalizeArabic(kw);
 
                                      int index = cleanText.toLowerCase().indexOf(cleanKw.toLowerCase());
                                      while (index != -1) {

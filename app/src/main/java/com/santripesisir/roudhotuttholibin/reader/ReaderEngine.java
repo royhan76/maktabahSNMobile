@@ -171,10 +171,36 @@ public class ReaderEngine {
     }
 
     /**
+     * Returns true if the given title is a meaningful TOC entry.
+     * Filters out:
+     *  - Empty / whitespace-only strings
+     *  - Pure page-marker codes like "p11", "p1", "page5", "P11"
+     *  - Strings that are purely numeric (e.g. "11", "123")
+     *  - Strings shorter than 2 meaningful characters after trimming
+     *  - Strings that match pattern: optional letters + digits only (anchor/id patterns)
+     */
+    private boolean isValidTocTitle(String title) {
+        if (title == null || title.trim().isEmpty()) return false;
+        String t = title.trim();
+        // Too short to be meaningful
+        if (t.length() < 2) return false;
+        // Pure numeric
+        if (t.matches("\\d+")) return false;
+        // Page marker pattern: p/P/pg/page followed by digits (e.g. p11, P3, pg5, page11)
+        if (t.matches("(?i)p(?:age|g)?\\d+")) return false;
+        // Generic anchor/id pattern: 1-4 letters followed by digits only (e.g. h1, h2, s3, ch4)
+        if (t.matches("[a-zA-Z]{1,4}\\d+")) return false;
+        // Only symbols/punctuation, no real word characters
+        if (!t.matches(".*[\\p{L}\\p{N}].*")) return false;
+        return true;
+    }
+
+    /**
      * Builds a Table of Contents by scanning every chapter.
      * Reads heading level from the first heading block found.
      * Falls back to level 1 if no heading block exists.
-     * Skips chapters whose title is empty or numeric-only (physical page markers).
+     * Skips chapters whose title is not a meaningful heading
+     * (e.g. pure page markers like "p11", numeric IDs, etc.).
      */
     public List<TocEntry> buildTableOfContents() {
         List<TocEntry> toc = new ArrayList<>();
@@ -183,7 +209,8 @@ public class ReaderEngine {
             try {
                 JSONObject ch = getChapter(i);
                 String chTitle = ch.optString("title", "").trim();
-                if (chTitle.isEmpty()) continue;
+                // Skip entries with no meaningful title
+                if (!isValidTocTitle(chTitle)) continue;
 
                 int level = 1;
                 String pageInfo = "";

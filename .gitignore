@@ -1,15 +1,24 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
 .DS_Store
 /build
+build/
+**/build/
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local SQLite databases
+*.db
+mai_reader.db
+
+# Large book source files (kitab)
+*.mai
+app/src/main/assets/books/*.mai
+
+# IDE files
+.idea/
+*.ipr
+*.iws

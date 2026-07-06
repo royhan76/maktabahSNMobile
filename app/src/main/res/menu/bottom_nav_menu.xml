@@ -13,7 +13,7 @@
         android:icon="@drawable/ic_settings"
         android:title="Pengaturan" />
     <item
-        android:id="@+id/nav_about"
-        android:icon="@drawable/ic_about"
-        android:title="Tentang" />
+        android:id="@+id/nav_ai"
+        android:icon="@drawable/ic_hero_book"
+        android:title="SN-AI" />
 </menu>

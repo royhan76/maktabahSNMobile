@@ -139,8 +139,12 @@ public class LibraryFragment extends Fragment {
                 });
                 mainHandler.post(() -> {
                     indexingProgressLayout.setVisibility(View.GONE);
+                    // Tandai item sebagai sudah ter-index agar klik selanjutnya langsung buka
+                    item.isIndexed = true;
+                    // Refresh badge di adapter tanpa reload seluruh list
+                    int idx = filteredItems.indexOf(item);
+                    if (idx >= 0) adapter.notifyItemChanged(idx);
                     Toast.makeText(requireContext(), "Indeks berhasil dibuat!", Toast.LENGTH_SHORT).show();
-                    loadBooks(); // refresh list to update badges
                     openBook(item);
                 });
             } catch (Exception e) {

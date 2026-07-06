@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
     android:padding="12dp">
 
     <!-- ========== HERO HEADER CARD (compact) ========== -->
@@ -12,7 +13,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
+        app:cardElevation="0dp"
+        app:cardUseCompatPadding="false"
         app:strokeWidth="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,7 +65,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Maktabah SN Digital"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold"
                         android:textColor="#FFFFFF"
                         android:shadowColor="#40000000"
@@ -83,7 +85,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Perpustakaan Santri Nusantara"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textColor="#C0FFFFFF" />
 
                 </LinearLayout>
@@ -103,6 +105,65 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_stats"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="0dp"
+        app:cardUseCompatPadding="false"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/card_header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorSurface"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Koleksi digital"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cari, buka, dan baca kitab dengan cepat"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Offline-ready"
+                android:textSize="12sp"
+                app:chipBackgroundColor="?attr/colorPrimaryContainer"
+                app:chipCornerRadius="999dp"
+                app:chipStrokeColor="?attr/colorOutline"
+                app:chipStrokeWidth="0dp"
+                android:textColor="?attr/colorPrimary" />
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- ========== SEARCH INPUT ========== -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_search"
@@ -111,15 +172,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:hint="Cari nama kitab..."
+        app:boxBackgroundColor="?attr/colorSurface"
+        app:boxStrokeColor="?attr/colorOutline"
+        app:endIconMode="clear_text"
         app:startIconDrawable="@drawable/ic_search"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/card_header">
+        app:layout_constraintTop_toBottomOf="@id/card_stats">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -130,7 +195,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:clipToPadding="false"
-        android:paddingBottom="8dp"
+        android:paddingBottom="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -142,7 +207,7 @@
         android:id="@+id/indexing_progress_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#A0000000"
+        android:background="#AA0F172A"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone"
